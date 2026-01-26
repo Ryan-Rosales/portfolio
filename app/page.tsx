@@ -1,6 +1,7 @@
 import { Badge } from "@/components/Badge";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Section } from "@/components/Section";
+import { ContactForm } from "@/components/ContactForm";
 import { portfolio } from "@/lib/portfolio";
 import Image from "next/image";
 
@@ -19,8 +20,17 @@ export default function Home() {
       : `${portfolio.currentlyLearning.slice(0, -1).join(", ")} and ${
           portfolio.currentlyLearning.slice(-1)[0]
         }`;
-  const emailLink = portfolio.links.find((l) => l.href.startsWith("mailto:"));
-  const emailAddress = emailLink?.href.replace(/^mailto:/, "");
+  const emailLink = portfolio.links.find(
+    (l) =>
+      l.href.startsWith("mailto:") ||
+      l.label.toLowerCase() === "email" ||
+      /.+@.+\..+/.test(l.href)
+  );
+  const emailAddress = emailLink
+    ? emailLink.href.startsWith("mailto:")
+      ? emailLink.href.replace(/^mailto:/, "")
+      : emailLink.href
+    : undefined;
   return (
     <div className="stack">
       <Section
@@ -136,21 +146,10 @@ export default function Home() {
       <Section
         id="contact"
         title="Contact"
-        description="My contact details and socials."
+        description="Send me a message and find my socials."
       >
         <div className="stack">
-          <div className="card">
-            <div className="space-y-3">
-              <h3 className="section-title">Contact Details</h3>
-              <p className="section-desc">Name: {portfolio.name}</p>
-              <p className="section-desc">Phone: 09318863168</p>
-              {emailLink ? (
-                <p className="section-desc">
-                  Email: <a href={emailLink.href} className="button-link">{emailAddress}</a>
-                </p>
-              ) : null}
-            </div>
-          </div>
+          <ContactForm recipientEmail={emailAddress} />
 
           <div className="links-row" aria-label="Social links">
             {portfolio.links
